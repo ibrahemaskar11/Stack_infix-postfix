@@ -148,10 +148,5 @@ void main() {
 		}
 	}
 	cout << postfix;
-	cout << "Check again";
-	cout << "Check again";
-	cout << "Check again";
-	cout << "Check again";
-
 	system("pause");
 }
