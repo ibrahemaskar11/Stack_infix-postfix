@@ -148,5 +148,6 @@ void main() {
 		}
 	}
 	cout << postfix;
+	cout << "hello world!" << endl;
 	system("pause");
 }
