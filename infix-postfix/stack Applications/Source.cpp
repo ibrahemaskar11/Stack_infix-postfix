@@ -150,5 +150,6 @@ void main() {
 	cout << postfix;
 	cout << "hello world!" << endl;
 	cout << "Another push" << endl;
+	cout << "Another push" << endl;
 	system("pause");
 }
