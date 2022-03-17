@@ -150,4 +150,5 @@ void main() {
 	}
 	cout << postfix;
 	system("pause");
+	cout << "Test";
 }
