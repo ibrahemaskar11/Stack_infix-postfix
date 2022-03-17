@@ -118,6 +118,7 @@ void main() {
 			postfix += infix[i];
 		}
 		else if (isOperator(infix[i])) {
+			postfix += ';';
 			if (infix[i] == '(') {
 				operatorSt.push(infix[i]);
 			}
