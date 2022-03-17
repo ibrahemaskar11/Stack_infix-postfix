@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
+#include <math.h>
 using namespace std;
-#define MAX 100
+#define MAX 20
 
 template<class H>
 class Stack {
@@ -101,12 +102,33 @@ int perc(char elem) {
 		return 3;
 	}
 }
-void main() {
+int calc(int operand1, int operand2, char op) {
+	switch (op)
+	{
+	case '+':
+		return operand1 + operand2;
+		break;
+	case '-':
+		return operand1 - operand2;
+		break;
+	case '*':
+		return operand1 * operand2;
+		break;
+	case '/':
+		return operand1 / operand2;
+		break;
+	case '^':
+		return pow(operand1, operand2);
+		break;
+	case '%':
+		return operand1 % operand2;
+		break;
+	}
+}
+string conv_postfix(string infix) {
+	string  postfix = "";
 	Stack<int> operandSt;
 	Stack<char> operatorSt;
-	string infix = "", postfix = "";
-	cout << "Please enter the infinx expression: ";
-	getline(cin, infix);
 	infix += ')';
 	operatorSt.push('(');
 	for (int i = 0; i < infix.length(); i++)
@@ -148,6 +170,37 @@ void main() {
 			exit(1);
 		}
 	}
-	cout << postfix;
-	system("pause");
+	return postfix;
+}
+int evaluation_postfix(string postfix) {
+	Stack<int> operator_stk;
+
+	for (int i = 0; i < postfix.length(); i++)
+	{
+		if (postfix[i] == ' ') {
+			continue;
+		}
+		if (isOperand(postfix[i])) {
+			string dummy;
+			while (postfix[i] != ';')
+			{
+				dummy += postfix[i];
+				i++;
+			}
+			int value = stoi(dummy);
+			operator_stk.push(value);
+			dummy = "";
+		}
+		if (isOperator(postfix[i])) {
+			int value2 = operator_stk.pop();
+			int value1 = operator_stk.pop();
+			operator_stk.push(calc(value1, value2, postfix[i]));
+		}
+	}
+	return operator_stk.pop();
+}
+
+void main() {
+	string test = conv_postfix("10+20*5");
+	cout << evaluation_postfix(test);
 }
