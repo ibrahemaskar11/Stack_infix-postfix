@@ -335,9 +335,22 @@ int evaluation_postfix(string postfix) {
 	}
 	return operator_stk.pop();
 }
-
+bool isValid(string input) {
+	for (int i = 0; i < input.length(); i++) {
+		if (input[i] == '.') {
+			return false;
+		}
+		else if (isalpha(input[i])) {
+			return false;
+		}
+		
+	}
+	return true;
+}
 void main() {
+	
 	string test = conv_postfix("10+20*5");
 	cout << test << endl;
-	cout << evaluation_postfix(test);
+	cout << evaluation_postfix(test) << endl;
+	cout << isValid("1+2+30") << endl;
 }
