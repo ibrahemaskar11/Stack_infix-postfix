@@ -205,49 +205,78 @@ bool isCalcOperator(char op) {
 		|| op == '-';
 
 }
+/*
+isValid function used to test if the infix expression is valid or not
+*/
 bool isValid(string infix) {
-	bool valid;
-	size_t firstAlpha = infix.find_first_not_of(' ');
-	size_t lastAlpha = infix.find_last_not_of(' ');
-	if (isCalcOperator(infix[firstAlpha]) || isCalcOperator(infix[lastAlpha])) {
+	/*
+	first index and last index using find_first_not_of to find the first index that is not a space
+	*/
+	size_t firstIndex = infix.find_first_not_of(' ');
+	size_t lastIndex = infix.find_last_not_of(' ');
+	/*
+	if statement used to check if the expression starts or ends with an arthmetic operator
+	*/
+	if (isCalcOperator(infix[firstIndex]) || isCalcOperator(infix[lastIndex])) {
 		cout << "Invalid input first/last character can not be an operator" << endl;
 		return false;
 	}
 	int open = 0;
 	int close = 0;
 	for (int i = 0; i < infix.length() - 1; i++) {
+		/*
+		if statement to skip any space in the string
+		*/
 		if (infix[i] == ' ') {
 			continue;
 		}
+		/*
+		if statement used to check if there's an invalid character in the string
+		*/
 		if (!isOperator(infix[i]) && !isOperand(infix[i])) {
 			cout << "Invalid input user has entered an invalid character" << endl;
 			return false;
 		}
+		/*
+		if statement used to check if there's two arthmetic operators next to each other
+		*/
 		else if (isCalcOperator(infix[i]) && isCalcOperator(infix[i+1])) {
 			cout << "Invalid input two operators next to each other" << endl;
 			return false;
 		}
+		/*
+		if statement used to check if there's an arthemtic operator after '(' or before ')'
+		*/
 		else if (isCalcOperator(infix[i]) && infix[i-1] == '(' || isCalcOperator(infix[i]) && infix[i+1] == ')') {
 			cout << "Invalid input an operator can't come after '(' or before ')'" << endl;
 			return false;
 		}
+		/*
+		if statements to accumulate the number of '(' and the number of ')' to be later checked on
+		*/
 		else if (infix[i] == '(') {
 			open++;
 		}
 		else if (infix[i] == ')') {
 			close++;
 		}
+		/*
+		if statements to avoid division by zero
+		*/
 		else if (infix[i] == '/' && infix[i+1] == '0') {
 			cout << "Invalid input division by zero is not possible" << endl;
 			return false;
 		}
 	}
-	if (infix[lastAlpha] == '(') {
+	if (infix[lastIndex] == '(') {
 		open++;
 	}
-	else if (infix[lastAlpha] == ')') {
+	else if (infix[lastIndex] == ')') {
 		close++;
 	}
+	/*
+	if statements to help the user know what is wrong with his/her expression
+	*/
 	if (open > close) {
 		cout << "Invalid input missing closing parentheses" << endl;
 		return false;
@@ -256,19 +285,19 @@ bool isValid(string infix) {
 		cout << "Invalid input missing opening parentheses" << endl;
 		return false;
 	}
-	else if (!isOperand(infix[lastAlpha]) && !isOperator(infix[lastAlpha])) {
-		cout << "Invalid input user has entered an invalid character" << endl;
-		return false;
-	}
 	return true;
 }
-
+/*
+is valid for evaluation function returns a boolean value and is used to check 
+if the postfix expression is valid for evaluation or not
+*/
 bool isValidForEvaluation(string input) {
 	for (int i = 0; i < input.length(); i++) {
-		if (input[i] == '.') {
-			return false;
-		}
-		else if (isalpha(input[i])) {
+		/*
+		if statement used to check if the string has an alphapetic character to check 
+		if it could be evaluated or not
+		*/
+		if (isalpha(input[i])) {
 			return false;
 		}
 
@@ -335,8 +364,15 @@ int evaluation_postfix(string postfix) {
 }
 /*
 Conversion function is used to convert an infix expression to postfix expression
+and gets a parameter from the user passed by reference to store the evaluated 
+value in the program if the expression is valid for evaluation
 */
-string conv_postfix(string infix) {
+string conv_postfix(string infix, int &val) {
+	/*
+	try catch statement used to check if the fucntion is valid for conversion 
+	if not valid the code is not to be continued and the function returns an
+	error message
+	*/
 	try
 	{
 		if (!isValid(infix)) {
@@ -344,7 +380,6 @@ string conv_postfix(string infix) {
 			throw 201;
 		}
 		string  postfix = "";
-		Stack<int> operandSt;
 		Stack<char> operatorSt;
 		/*
 		Parenthesize the expression starting from left to light
@@ -405,19 +440,8 @@ string conv_postfix(string infix) {
 						postfix += operatorSt.pop();
 					}
 					operatorSt.push(infix[i]);
-
 				}
 			}
-			/*
-			if the scanned character is in invalid we print an error message to the user
-			*/
-			/*
-			else {
-				cout << "NOT VALID EXPRESSION!";
-				system("pause");
-				exit(1);
-			}
-			*/
 		}
 		/*
 		erase function used to remove the semi colons from the postfix string
@@ -425,10 +449,11 @@ string conv_postfix(string infix) {
 		*/
 		string dummy = postfix;
 		dummy.erase(remove(dummy.begin(), dummy.end(), ';'), dummy.end());
-		cout << dummy << endl;
-		cout << postfix << endl;
-		cout << evaluation_postfix(postfix) << endl;
-		return postfix;
+		if (isValidForEvaluation(postfix)) {
+			val = evaluation_postfix(postfix);
+		}
+			
+		return dummy;
 	}
 	catch (int x)
 	{
@@ -438,8 +463,34 @@ string conv_postfix(string infix) {
 
 
 void main() {
-	
-	string test = conv_postfix("10+20*50+80)");
 
+	int val = 0;
+	string infix;
+	string postfix;
+	char ch;
+	/*
+	do while function to execute the following code first and then ask the user 
+	if he/she wants to enter another expression
+	*/
+	do
+	{
 
+		cout << "Please enter Infix Expression: ";
+		getline(cin, infix);
+		postfix = conv_postfix(infix, val);
+		cout << "Postfix Expression: " << postfix << endl;
+		if (isValidForEvaluation(postfix)) {
+			cout << "Evaluated value: " << val << endl;
+		}
+		else {
+			cout << "Expression does not need to be evaluated" << endl;
+		}
+		cout << "Do you want to enter another expression (y/Y) for yes (n/N) for No: ";
+		cin >> ch;
+		cout << endl;
+		/*
+		ignore function is used to allow the program to use getline inside the while loop
+		*/
+		cin.ignore(1);
+	} while (ch == 'y' || ch == 'Y');
 }
