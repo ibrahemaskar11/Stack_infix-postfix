@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <math.h>
+#include <stdexcept>
 using namespace std;
 #define MAX 20
 
@@ -195,99 +196,97 @@ int calc(int operand1, int operand2, char op) {
 		break;
 	}
 }
-/*
-Conversion function is used to convert an infix expression to postfix expression
-*/
-string conv_postfix(string infix) {
-	string  postfix = "";
-	Stack<int> operandSt;
-	Stack<char> operatorSt;
-	/*
-	Parenthesize the expression starting from left to light
-	we push ( to the stack and end the infix string with )
-	*/
-	infix += ')';
-	operatorSt.push('(');
-	/*
-	for loop is used to scan each character in the string to convert the string 
-	*/
-	for (int i = 0; i < infix.length(); i++)
-	{
-		/*
-		if statement used to handle the space error in the infix string (invalid input)
-		*/
+bool isCalcOperator(char op) {
+	return op == '^'
+		|| op == '*'
+		|| op == '/'
+		|| op == '%'
+		|| op == '+'
+		|| op == '-';
+
+}
+bool isValid(string infix) {
+	bool valid;
+	size_t firstAlpha = infix.find_first_not_of(' ');
+	size_t lastAlpha = infix.find_last_not_of(' ');
+	if (isCalcOperator(infix[firstAlpha]) || isCalcOperator(infix[lastAlpha])) {
+		cout << "Invalid input first/last character can not be an operator" << endl;
+		return false;
+	}
+	int open = 0;
+	int close = 0;
+	for (int i = 0; i < infix.length() - 1; i++) {
 		if (infix[i] == ' ') {
 			continue;
 		}
-		/*
-		if statement used to check if the character is an operand
-		if character is an operand we add it to the postfix string
-		*/
-		if (isOperand(infix[i])) {
-			postfix += infix[i];
+		if (!isOperator(infix[i]) && !isOperand(infix[i])) {
+			cout << "Invalid input user has entered an invalid character" << endl;
+			return false;
 		}
-		/*
-		if statement used to check if the character is an operator
-		if character is an operator we push it to the stack
-		*/
-		else if (isOperator(infix[i])) {
-			/*
-			we add a semi colon to identify the operands from each other
-			*/
-			postfix += ';';
-			if (infix[i] == '(') {
-				operatorSt.push(infix[i]);
-			}
-			/*
-			if a ) is scanned the algorithm starts to pop operators from the stack
-			to the postfix string till it finds a ( */
-			else if (infix[i] == ')') {
-				while (operatorSt.peak() != '(')
-				{
-					postfix += operatorSt.pop();
-				}
-				/*
-				Another pop is used to delete the ( from the stack 
-				*/
-				operatorSt.pop();
-			}
-			/*
-			if the scanned character is not a ( or ) we pop or push to or from the stack
-			passed on the percedence
-			*/
-			else {
-				while (perc(infix[i]) <= perc(operatorSt.peak()))
-				{
-					postfix += operatorSt.pop();
-				}
-				operatorSt.push(infix[i]);
-
-			}
+		else if (isCalcOperator(infix[i]) && isCalcOperator(infix[i + 1])) {
+			cout << "Invalid input two operators next to each other" << endl;
+			return false;
 		}
-		/*
-		if the scanned character is in invalid we print an error message to the user
-		*/
-		else {
-			cout << "NOT VALID EXPRESSION!";
-			system("pause");
-			exit(1);
+		else if (isCalcOperator(infix[i]) && infix[i - 1] == '(' || isCalcOperator(infix[i]) && infix[i + 1] == ')') {
+			cout << "Invalid input an operator can't come after '(' or before ')'" << endl;
+			return false;
+		}
+		else if (infix[i] == '(') {
+			open++;
+		}
+		else if (infix[i] == ')') {
+			close++;
+		}
+		else if (infix[i] == '/' && infix[i + 1] == '0') {
+			cout << "Invalid input division by zero is not possible" << endl;
+			return false;
 		}
 	}
-	/*
-	erase function used to remove the semi colons from the postfix string 
-	to print the correct postfix expression to the user
-	*/
-	string dummy = postfix;
-	dummy.erase(remove(dummy.begin(), dummy.end(), ';'), dummy.end());
-	cout << dummy << endl;
-	return postfix;
+	if (infix[lastAlpha] == '(') {
+		open++;
+	}
+	else if (infix[lastAlpha] == ')') {
+		close++;
+	}
+	if (open > close) {
+		cout << "Invalid input missing closing parentheses" << endl;
+		return false;
+	}
+	else if (open < close) {
+		cout << "Invalid input missing opening parentheses" << endl;
+		return false;
+	}
+	else if (!isOperand(infix[lastAlpha]) && !isOperator(infix[lastAlpha])) {
+		cout << "Invalid input user has entered an invalid character" << endl;
+		return false;
+	}
+	return true;
 }
+
+bool isValidForEvaluation(string input) {
+	for (int i = 0; i < input.length(); i++) {
+		if (input[i] == '.') {
+			return false;
+		}
+		else if (isalpha(input[i])) {
+			return false;
+		}
+
+	}
+	return true;
+}
+
 /*
 Evaluation function is used to evalute only the valid postfix expressions
 and return the resulted value of the expression
 */
 int evaluation_postfix(string postfix) {
 	Stack<int> operator_stk;
+	/*
+	dummy string acts as an accmulator to the multi digits operands for it
+	to be later converted into intger values
+	*/
+	string dummy = "";
 	/*
 	for loop is used to scan each character in the string to convert the string
 	*/
@@ -304,16 +303,15 @@ int evaluation_postfix(string postfix) {
 		*/
 		if (isOperand(postfix[i])) {
 			/*
-			if the scaneed character is an operand we start a loop storing 
-			every element till we find a ; 
-			this functionality is used to handle the multi digit input
+			if the sacnned character is an operand and not equal to ; we add it to a dummy string
+			then when we scan the ; we push the value to the stack to be later evaluated
 			*/
-			string dummy;
-			while (postfix[i] != ';')
-			{
+			if (postfix[i] != ';')
 				dummy += postfix[i];
-				i++;
-			}
+
+
+		}
+		if (postfix[i] == ';') {
 			int value = stoi(dummy);
 			operator_stk.push(value);
 			dummy = "";
@@ -323,8 +321,8 @@ int evaluation_postfix(string postfix) {
 		*/
 		if (isOperator(postfix[i])) {
 			/*
-			if the scanned character is an operator we do two pops from the stack 
-			the first pop is the second value 
+			if the scanned character is an operator we do two pops from the stack
+			the first pop is the second value
 			the second pop is the first value
 			After that we push the value to the stack
 			*/
@@ -335,22 +333,112 @@ int evaluation_postfix(string postfix) {
 	}
 	return operator_stk.pop();
 }
-bool isValid(string input) {
-	for (int i = 0; i < input.length(); i++) {
-		if (input[i] == '.') {
-			return false;
+/*
+Conversion function is used to convert an infix expression to postfix expression
+*/
+string conv_postfix(string infix) {
+	try
+	{
+		if (!isValid(infix)) {
+			return ("INVALID ARGUMENT");
+			throw 201;
 		}
-		else if (isalpha(input[i])) {
-			return false;
+		string  postfix = "";
+		Stack<int> operandSt;
+		Stack<char> operatorSt;
+		/*
+		Parenthesize the expression starting from left to light
+		we push ( to the stack and end the infix string with )
+		*/
+		infix += ')';
+		operatorSt.push('(');
+		/*
+		for loop is used to scan each character in the string to convert the string
+		*/
+		for (int i = 0; i < infix.length(); i++)
+		{
+			/*
+			if statement used to handle the space error in the infix string (invalid input)
+			*/
+			if (infix[i] == ' ') {
+				continue;
+			}
+			/*
+			if statement used to check if the character is an operand
+			if character is an operand we add it to the postfix string
+			*/
+			if (isOperand(infix[i])) {
+				postfix += infix[i];
+			}
+			/*
+			if statement used to check if the character is an operator
+			if character is an operator we push it to the stack
+			*/
+			else if (isOperator(infix[i])) {
+				/*
+				we add a semi colon to identify the operands from each other
+				*/
+				postfix += ';';
+				if (infix[i] == '(') {
+					operatorSt.push(infix[i]);
+				}
+				/*
+				if a ) is scanned the algorithm starts to pop operators from the stack
+				to the postfix string till it finds a ( */
+				else if (infix[i] == ')') {
+					while (operatorSt.peak() != '(')
+					{
+						postfix += operatorSt.pop();
+					}
+					/*
+					Another pop is used to delete the ( from the stack
+					*/
+					operatorSt.pop();
+				}
+				/*
+				if the scanned character is not a ( or ) we pop or push to or from the stack
+				passed on the percedence
+				*/
+				else {
+					while (perc(infix[i]) <= perc(operatorSt.peak()))
+					{
+						postfix += operatorSt.pop();
+					}
+					operatorSt.push(infix[i]);
+
+				}
+			}
+			/*
+			if the scanned character is in invalid we print an error message to the user
+			*/
+			/*
+			else {
+				cout << "NOT VALID EXPRESSION!";
+				system("pause");
+				exit(1);
+			}
+			*/
 		}
-		
+		/*
+		erase function used to remove the semi colons from the postfix string
+		to print the correct postfix expression to the user
+		*/
+		string dummy = postfix;
+		dummy.erase(remove(dummy.begin(), dummy.end(), ';'), dummy.end());
+		cout << dummy << endl;
+		cout << postfix << endl;
+		cout << evaluation_postfix(postfix) << endl;
+		return postfix;
 	}
-	return true;
+	catch (int x)
+	{
+		cout << "INVALID ARGUMENT" << endl;
+	}
 }
+
+
 void main() {
 	
-	string test = conv_postfix("10+20*5");
-	cout << test << endl;
-	cout << evaluation_postfix(test) << endl;
-	cout << isValid("1+2+30") << endl;
+	string test = conv_postfix("10+20*50+80)");
+
 }
