@@ -223,11 +223,11 @@ bool isValid(string infix) {
 			cout << "Invalid input user has entered an invalid character" << endl;
 			return false;
 		}
-		else if (isCalcOperator(infix[i]) && isCalcOperator(infix[i + 1])) {
+		else if (isCalcOperator(infix[i]) && isCalcOperator(infix[i+1])) {
 			cout << "Invalid input two operators next to each other" << endl;
 			return false;
 		}
-		else if (isCalcOperator(infix[i]) && infix[i - 1] == '(' || isCalcOperator(infix[i]) && infix[i + 1] == ')') {
+		else if (isCalcOperator(infix[i]) && infix[i-1] == '(' || isCalcOperator(infix[i]) && infix[i+1] == ')') {
 			cout << "Invalid input an operator can't come after '(' or before ')'" << endl;
 			return false;
 		}
@@ -237,7 +237,7 @@ bool isValid(string infix) {
 		else if (infix[i] == ')') {
 			close++;
 		}
-		else if (infix[i] == '/' && infix[i + 1] == '0') {
+		else if (infix[i] == '/' && infix[i+1] == '0') {
 			cout << "Invalid input division by zero is not possible" << endl;
 			return false;
 		}
@@ -440,5 +440,6 @@ string conv_postfix(string infix) {
 void main() {
 	
 	string test = conv_postfix("10+20*50+80)");
+
 
 }
