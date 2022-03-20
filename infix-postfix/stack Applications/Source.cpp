@@ -215,6 +215,14 @@ bool isValid(string infix) {
 	size_t firstIndex = infix.find_first_not_of(' ');
 	size_t lastIndex = infix.find_last_not_of(' ');
 	/*
+	if statement to check if the user has entered no input
+	*/
+	if (infix == "") {
+		cout << "Invalid input infix expression can not be empty" << endl;
+		return false;
+	}
+	
+	/*
 	if statement used to check if the expression starts or ends with an arthmetic operator
 	*/
 	if (isCalcOperator(infix[firstIndex]) || isCalcOperator(infix[lastIndex])) {
@@ -292,6 +300,9 @@ is valid for evaluation function returns a boolean value and is used to check
 if the postfix expression is valid for evaluation or not
 */
 bool isValidForEvaluation(string input) {
+	if (input == "") {
+		return false;
+	}
 	for (int i = 0; i < input.length(); i++) {
 		/*
 		if statement used to check if the string has an alphapetic character to check 
@@ -300,7 +311,6 @@ bool isValidForEvaluation(string input) {
 		if (isalpha(input[i])) {
 			return false;
 		}
-
 	}
 	return true;
 }
@@ -373,11 +383,9 @@ string conv_postfix(string infix, int &val) {
 	if not valid the code is not to be continued and the function returns an
 	error message
 	*/
-	try
-	{
+	
 		if (!isValid(infix)) {
-			return ("INVALID ARGUMENT");
-			throw 201;
+			return "";
 		}
 		string  postfix = "";
 		Stack<char> operatorSt;
@@ -452,13 +460,9 @@ string conv_postfix(string infix, int &val) {
 		if (isValidForEvaluation(postfix)) {
 			val = evaluation_postfix(postfix);
 		}
-			
+		cout << "Postfix Expression: ";
 		return dummy;
-	}
-	catch (int x)
-	{
-		cout << "INVALID ARGUMENT" << endl;
-	}
+	
 }
 
 
@@ -474,11 +478,10 @@ void main() {
 	*/
 	do
 	{
-
 		cout << "Please enter Infix Expression: ";
 		getline(cin, infix);
 		postfix = conv_postfix(infix, val);
-		cout << "Postfix Expression: " << postfix << endl;
+		cout << postfix << endl;
 		if (isValidForEvaluation(postfix)) {
 			cout << "Evaluated value: " << val << endl;
 		}
