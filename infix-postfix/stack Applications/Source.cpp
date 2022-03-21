@@ -41,12 +41,14 @@ Stack<H>::Stack() {
 }
 /*
 push function used to insert elements to the stack
+write function
 */
 template <class H>
 void Stack<H>::push(H elem) {
 	/*
 	before inserting elements to the stack we check if it is full first
 	if full we print an error message
+	checking for overflow
 	*/
 	if (isFull()) {
 		cout << "Stack is Full \n";
@@ -64,6 +66,7 @@ H Stack<H>::peak() {
 	/*
 	before deleting elements from the stack we check if it is empty first
 	if empty we print an error message
+	checking for underflow
 	*/
 	if (isEmpty()) {
 		cout << "Stack is Empty \n";
@@ -127,7 +130,7 @@ int Stack<H>::size() {
 /*
 isOperand function is used to return a boolean value based on the input
 if element is operand returns true
-used in the convertion to postfix function
+used in the conversion to postfix function
 */
 bool isOperand(char elem) {
 	return ('0' <= elem && elem <= '9')
@@ -138,7 +141,7 @@ bool isOperand(char elem) {
 /*
 isOperator function is used to return a boolean value based on the input
 if element is operator returns true
-used in the convertion to postfix function
+used in the conversion to postfix function
 */
 bool isOperator(char elem) {
 	return elem == '+'
@@ -153,7 +156,7 @@ bool isOperator(char elem) {
 /*
 returns the percedence of the operators
 used to determine the priorty of operators
-used in the convertion to postfix function
+used in the conversion to postfix function
 */
 int perc(char elem) {
 	if (elem == '(') {
@@ -171,7 +174,7 @@ int perc(char elem) {
 }
 /*
 used to do simple calculations 
-used in the evaluation of postfix expression function
+used in the evaluation of postfix expression
 */
 int calc(int operand1, int operand2, char op) {
 	switch (op)
@@ -203,10 +206,9 @@ bool isCalcOperator(char op) {
 		|| op == '%'
 		|| op == '+'
 		|| op == '-';
-
 }
 /*
-isValid function used to test if the infix expression is valid or not
+isValid function used to test and return a boolean value if the infix expression is valid or not
 */
 bool isValid(string infix) {
 	/*
@@ -379,9 +381,7 @@ value in the program if the expression is valid for evaluation
 */
 string conv_postfix(string infix, int &val) {
 	/*
-	try catch statement used to check if the fucntion is valid for conversion 
-	if not valid the code is not to be continued and the function returns an
-	error message
+	if statement used to check if the entered expression is valid or not before conversion
 	*/
 	
 		if (!isValid(infix)) {
@@ -460,7 +460,6 @@ string conv_postfix(string infix, int &val) {
 		if (isValidForEvaluation(postfix)) {
 			val = evaluation_postfix(postfix);
 		}
-		cout << "Postfix Expression: ";
 		return dummy;
 	
 }
@@ -474,14 +473,14 @@ void main() {
 	char ch;
 	/*
 	do while function to execute the following code first and then ask the user 
-	if he/she wants to enter another expression
+	if the user wants to enter another expression
 	*/
 	do
 	{
 		cout << "Please enter Infix Expression: ";
 		getline(cin, infix);
 		postfix = conv_postfix(infix, val);
-		cout << postfix << endl;
+		cout << "Postfix Expression: " << postfix << endl;
 		if (isValidForEvaluation(postfix)) {
 			cout << "Evaluated value: " << val << endl;
 		}
