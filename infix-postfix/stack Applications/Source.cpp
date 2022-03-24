@@ -1,9 +1,15 @@
+/*
+Team 1
+Assignment 1
+Stack application| Converstion of infix expression to postfix expression and evaluation of the postfix expressions using stack
+*/
+
 #include <iostream>
 #include <string>
 #include <math.h>
 #include <stdexcept>
 using namespace std;
-#define MAX 20
+#define MAX 100
 
 /*
 we use template stack to not rewrite the same code twice
@@ -273,9 +279,13 @@ bool isValid(string infix) {
 		/*
 		if statements to avoid division by zero
 		*/
-		else if (infix[i] == '/' && infix[i+1] == '0') {
-			cout << "Invalid input division by zero is not possible" << endl;
-			return false;
+		else if (infix[i] == '/') {
+			string sub = infix.substr(i+1, infix.length()-1);
+			size_t firstOperandAfter = i+1+sub.find_first_not_of(" ");
+			if (infix[firstOperandAfter] == '0') {
+				cout << "Invalid input division by zero is not possible" << endl;
+				return false;
+			}
 		}
 	}
 	if (infix[lastIndex] == '(') {
@@ -347,7 +357,6 @@ int evaluation_postfix(string postfix) {
 			if the sacnned character is an operand and not equal to ; we add it to a dummy string
 			then when we scan the ; we push the value to the stack to be later evaluated
 			*/
-			if (postfix[i] != ';')
 				dummy += postfix[i];
 
 
@@ -495,4 +504,5 @@ void main() {
 		*/
 		cin.ignore(1);
 	} while (ch == 'y' || ch == 'Y');
+	cout << "Thanks for your time" << endl;
 }
