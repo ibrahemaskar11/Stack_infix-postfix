@@ -57,7 +57,7 @@ void Stack<H>::push(H elem) {
 	checking for overflow
 	*/
 	if (isFull()) {
-		cout << "Stack is Full \n";
+		cout << "Stack is overflow \n";
 		system("pause");
 		exit(1);
 	}
@@ -75,7 +75,7 @@ H Stack<H>::peak() {
 	checking for underflow
 	*/
 	if (isEmpty()) {
-		cout << "Stack is Empty \n";
+		cout << "Stack is overflow \n";
 		system("pause");
 		exit(1);
 	}
@@ -91,7 +91,7 @@ H Stack<H>::pop() {
 	if empty we print an error message
 	*/
 	if (isEmpty()) {
-		cout << "Stack is Empty \n";
+		cout << "Stack is underflow \n";
 		system("pause");
 		exit(1);
 	}
@@ -256,32 +256,42 @@ bool isValid(string infix) {
 		/*
 		if statement used to check if there's two arthmetic operators next to each other
 		*/
-		else if (isCalcOperator(infix[i]) && isCalcOperator(infix[i+1])) {
-			cout << "Invalid input two operators next to each other" << endl;
-			return false;
+		 if (isCalcOperator(infix[i])) {
+			string sub = infix.substr(i + 1, infix.length());
+			size_t firstOperandAfter = i + 1 + sub.find_first_not_of(" ");
+			if (isCalcOperator(infix[firstOperandAfter])) {
+				cout << "Invalid input two operators next to each other" << endl;
+				return false;
+			}
 		}
 		/*
 		if statement used to check if there's an arthemtic operator after '(' or before ')'
 		*/
-		else if (isCalcOperator(infix[i]) && infix[i-1] == '(' || isCalcOperator(infix[i]) && infix[i+1] == ')') {
-			cout << "Invalid input an operator can't come after '(' or before ')'" << endl;
-			return false;
+		 if (isCalcOperator(infix[i])) {
+			string subBefore = infix.substr(0, i);
+			size_t lastOperandBefore = subBefore.find_last_not_of(" ");
+			string subAfter = infix.substr(i + 1, infix.length());
+			size_t firstOperandAfter = i + 1 + subAfter.find_first_not_of(" ");
+			if (infix[lastOperandBefore] == '(' || infix[firstOperandAfter] == ')') {
+				cout << "Invalid input an operator can't come after '(' or before ')'" << endl;
+				return false;
+			}
 		}
 		/*
 		if statements to accumulate the number of '(' and the number of ')' to be later checked on
 		*/
-		else if (infix[i] == '(') {
+		if (infix[i] == '(') {
 			open++;
 		}
-		else if (infix[i] == ')') {
+		if (infix[i] == ')') {
 			close++;
 		}
 		/*
 		if statements to avoid division by zero
 		*/
-		else if (infix[i] == '/') {
-			string sub = infix.substr(i+1, infix.length()-1);
-			size_t firstOperandAfter = i+1+sub.find_first_not_of(" ");
+		if (infix[i] == '/') {
+			string sub = infix.substr(i+1, infix.length());
+			size_t firstOperandAfter = i + 1 + sub.find_first_not_of(" ");
 			if (infix[firstOperandAfter] == '0') {
 				cout << "Invalid input division by zero is not possible" << endl;
 				return false;
@@ -481,7 +491,7 @@ void main() {
 	string postfix;
 	char ch;
 	/*
-	do while function to execute the following code first and then ask the user 
+	do while function to execute the following code first and then ask the user
 	if the user wants to enter another expression
 	*/
 	do
@@ -505,4 +515,12 @@ void main() {
 		cin.ignore(1);
 	} while (ch == 'y' || ch == 'Y');
 	cout << "Thanks for your time" << endl;
+	string exp = "A+b / 0";
+	int pointer = 4;
+	string sub = exp.substr(pointer+1, exp.length());
+	cout << sub << endl;
+	size_t firstOperand = pointer+1+sub.find_first_not_of(" ");
+	if (exp[firstOperand] == '0') {
+		cout << "Invalid Input can not divide by zero" << endl;
+	}
 }
